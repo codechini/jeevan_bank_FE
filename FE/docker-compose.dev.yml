@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  web:
+    container_name: vite-react-app-dev
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
