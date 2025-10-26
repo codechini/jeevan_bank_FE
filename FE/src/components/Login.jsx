@@ -1,5 +1,7 @@
 // import React from 'react';
 
+import Button from "./Button";
+
 const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -18,7 +20,7 @@ const Login = () => {
             <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-600">Password</label>
             <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="password" id="password" name="password" />
           </div>
-          <button className="w-full py-2 text-white bg-yellow-500 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" type="submit">Login</button>
+          <Button className="w-full py-2 text-white bg-yellow-500 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" type="submit">Login</Button>
         </form>
       </div>
     </div>

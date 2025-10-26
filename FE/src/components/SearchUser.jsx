@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react';
+import Button from './Button';
 
 const SearchUser = () => {
   const [userId, setUserId] = useState('');
@@ -26,30 +27,43 @@ const SearchUser = () => {
     setLoading(false);
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:8080/api/users/${id}`);
+      setUserData(null); // Clear the user data from view
+    } catch (error) {
+      setError('Error deleting user.');
+      console.error('Error deleting user:', error);
+    }
+  };
+
   return (
-    <div>
-      {/* <h2>Search User by ID</h2> */}
-      <div>
+    <div className="w-full max-w-4xl p-8 mx-auto bg-white rounded-lg shadow-md">
+      <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">Search User by ID</h2>
+      <div className="flex justify-center mb-4">
         <input
           type="text"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
           placeholder="Enter User ID"
+          className="px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
-        <button onClick={handleSearch} disabled={loading}>
+        <Button onClick={handleSearch} disabled={loading}>
           {loading ? 'Searching...' : 'Search'}
-        </button>
+        </Button>
       </div>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="text-center text-red-500">{error}</p>}
 
       {userData && (
-        <div>
-          <h3>User Details</h3>
-          <p><strong>ID:</strong> {userData.id}</p>
-          <p><strong>Name:</strong> {userData.firstName} {userData.lastName}</p>
-          <p><strong>Email:</strong> {userData.email}</p>
-          {/* You can add more fields here as per your user object structure */}
+        <div className="mt-6">
+          <h3 className="mb-4 text-xl font-bold text-center text-gray-800">User Details</h3>
+          <div className="p-4 border border-gray-200 rounded-md">
+            <p><strong>ID:</strong> {userData.user_id}</p>
+            <p><strong>Email:</strong> {userData.email}</p>
+            <Button variant="delete" onClick={() => handleDelete(userData.user_id)} />
+            <Button variant="update" />
+          </div>
         </div>
       )}
     </div>

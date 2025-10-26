@@ -13,7 +13,8 @@ const DashboardHome = () => {
               {/* <h1>Hello</h1> */}
             </div>
             <div className="col-span-1 row-span-1">
-              <ViewUser />
+              {/* <ViewUser /> */}
+              <p>More further metrics</p>
             </div>
           </div>
         </div>

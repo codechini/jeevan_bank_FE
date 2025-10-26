@@ -1,4 +1,5 @@
 // import UserCount from "../../components/UserCount";
+import UpdateUser from "../../components/UpdateUser";
 import ViewUser from "../../components/ViewUser";
 import DashboardCreateUser from "../../pages/DashboardCreateUser";
 import DashboardHome from "../../pages/DashboardHome";
@@ -24,5 +25,10 @@ export const DASHBOARD_ROUTES = [
     path: "searchusers",
     name: "Search Users",
     element: <DashboardSearchUsers />,
+  },
+  {
+    path: "updateusers",
+    name: "Update Users",
+    element: <UpdateUser />,
   }
 ];

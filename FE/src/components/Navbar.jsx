@@ -4,6 +4,7 @@ const Navbar = () => {
       <a href="/login">login</a>
       <a href="/register">Register</a>
       <a href="/">Home</a>
+      <a href="/loan">Loan</a>
     </div>
   );
 }

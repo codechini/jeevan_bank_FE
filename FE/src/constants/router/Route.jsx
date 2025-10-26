@@ -2,6 +2,7 @@ import UserCount from "../../components/UserCount";
 import ViewUser from "../../components/ViewUser";
 import Dashboard from "../../pages/Dashboard";
 import Home from "../../pages/Home";
+import Loan from "../../pages/Loan";
 import LoginPage from "../../pages/LoginPage";
 import RegistrationPage from "../../pages/RegistrationPage";
 
@@ -22,6 +23,10 @@ export const ROUTES = [
     path: "/dashboard/*",
     element: <Dashboard />,
   },
+  {
+    path: "/loan",
+    element: <Loan />,
+  }
   // {
   //   path: "/dashboard/users",
   //   element: <ViewUser />,
