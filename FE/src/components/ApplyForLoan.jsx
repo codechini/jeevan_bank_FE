@@ -80,11 +80,11 @@ const ApplyForLoan = ({ title = 'Apply For Loan' }) => {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
               <label htmlFor="Loan reason" className="block mb-2 text-sm font-medium text-gray-600">Loan reason</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="text" id="address" name="address" value={formData.address} onChange={handleChange} />
+              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" type="text" id="address" name="address" value={formData.address} onChange={handleChange} />
             </div>
             <div>
               <label htmlFor="Loan Ammount" className="block mb-2 text-sm font-medium text-gray-600">Loan Amount</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="number" id="account_number" name="account_number" value={formData.account_number} onChange={handleChange} />
+              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" type="number" id="account_number" name="account_number" value={formData.account_number} onChange={handleChange} />
             </div>
             <div>
               <label htmlFor="loan_type" className="block mb-2 text-sm font-medium text-gray-600">Loan Type</label>
@@ -93,7 +93,7 @@ const ApplyForLoan = ({ title = 'Apply For Loan' }) => {
                 name="loan_type"
                 value={formData.loan_type}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="">Select a loan type</option>
                 <option value="personal">Personal</option>
@@ -105,9 +105,9 @@ const ApplyForLoan = ({ title = 'Apply For Loan' }) => {
 
           </div>
           <div className="mt-6">
-            <Button className="w-full py-2 text-white bg-yellow-500 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" type="submit">
+            <button className="w-full py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" type="submit">
               Apply
-            </Button>
+            </button>
           </div>
         </form>
       </div>

@@ -20,7 +20,7 @@ const UserCount = () => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md min-h-full">
       <h2 className="text-xl text-center font-semibold mb-2">Total Users</h2>
-      <p className="text-3xl text-center font-bold text-gray-800">{count}</p>
+      <p className="text-3xl text-center font-bold text-purple-800">{count}</p>
     </div>
   );
 };

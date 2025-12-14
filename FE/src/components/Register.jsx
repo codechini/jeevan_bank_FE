@@ -76,41 +76,47 @@ const Register = ({ title = 'Register' }) => {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
               <label htmlFor="fullName" className="block mb-2 text-sm font-medium text-gray-600">Full Name</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="text" id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} />
+              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" type="text" id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} />
             </div>
             <div>
               <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-600">Email</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="email" id="email" name="email" value={formData.email} onChange={handleChange} />
+              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" type="email" id="email" name="email" value={formData.email} onChange={handleChange} />
             </div>
             <div>
               <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-600">Password</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="password" id="password" name="password" value={formData.password} onChange={handleChange} />
+              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" type="password" id="password" name="password" value={formData.password} onChange={handleChange} />
             </div>
             <div>
               <label htmlFor="confirmPassword" className="block mb-2 text-sm font-medium text-gray-600">Confirm Password</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} />
+              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} />
             </div>
             <div>
               <label htmlFor="phone_number" className="block mb-2 text-sm font-medium text-gray-600">Phone Number</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="text" id="phone_number" name="phone_number" value={formData.phone_number} onChange={handleChange} />
+              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" type="text" id="phone_number" name="phone_number" value={formData.phone_number} onChange={handleChange} />
             </div>
             <div>
               <label htmlFor="address" className="block mb-2 text-sm font-medium text-gray-600">Address</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="text" id="address" name="address" value={formData.address} onChange={handleChange} />
+              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" type="text" id="address" name="address" value={formData.address} onChange={handleChange} />
             </div>
             <div>
               <label htmlFor="account_number" className="block mb-2 text-sm font-medium text-gray-600">Account Number</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="number" id="account_number" name="account_number" value={formData.account_number} onChange={handleChange} />
+              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" type="number" id="account_number" name="account_number" value={formData.account_number} onChange={handleChange} />
             </div>
             <div>
               <label htmlFor="balance" className="block mb-2 text-sm font-medium text-gray-600">Initial Balance</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="number" step="0.01" id="balance" name="balance" value={formData.balance} onChange={handleChange} />
+              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" type="number" step="0.01" id="balance" name="balance" value={formData.balance} onChange={handleChange} />
             </div>
           </div>
           <div className="mt-6">
-            <button className="w-full py-2 text-white bg-yellow-500 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" type="submit">Register</button>
+            <button className="w-full py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" type="submit">Register</button>
           </div>
         </form>
+        <p className="mt-10 text-center text-sm/6 text-gray-500">
+          Already a member{' '}
+          <a href="/login" className="font-semibold text-purple-400 hover:text-purple-500">
+            Login
+          </a>
+        </p>
       </div>
     </div>
   );

@@ -42,12 +42,12 @@ const ViewUser = () => {
   return (
     <div className="flex items-center justify-center">
       <div className="w-full max-w-4xl p-8 bg-white rounded-lg shadow-md">
-        <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">All Users</h2>
+        <h2 className="mb-6 text-2xl font-bold text-center text-purple-800">All Users</h2>
         <div className="overflow-x-auto">
           <ul className="space-y-4">
             {users.length > 0 ? (
               users.map((user) => (
-                <li key={user.user_id} className="p-4 border border-gray-200 rounded-md">
+                <li key={user.user_id} className="p-4 border border-purple-200 rounded-md">
                   <p><strong>ID:</strong> {user.user_id}</p>
                   <p><strong>Name:</strong> {user.first_name} {user.last_name}</p>
                   <p><strong>Email:</strong> {user.email}</p>
@@ -58,7 +58,7 @@ const ViewUser = () => {
                 </li>
               ))
             ) : (
-              <p className="text-center text-gray-500">No users found.</p>
+              <p className="text-center text-purple-500">No users found.</p>
             )}
           </ul>
         </div>

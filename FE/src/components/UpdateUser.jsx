@@ -84,29 +84,29 @@ const UpdateUser = ({ userId, onUpdateComplete, title = 'Update User Details' })
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-full max-w-4xl p-8 bg-white rounded-lg shadow-md">
-        <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">{title}</h2>
+        <h2 className="mb-6 text-2xl font-bold text-center text-purple-800">{title}</h2>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label htmlFor="fullName" className="block mb-2 text-sm font-medium text-gray-600">Full Name</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="text" id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} required />
+              <label htmlFor="fullName" className="block mb-2 text-sm font-medium text-purple-600">Full Name</label>
+              <input className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="text" id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} required />
             </div>
             <div>
-              <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-600">Email</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
+              <label htmlFor="email" className="block mb-2 text-sm font-medium text-purple-600">Email</label>
+              <input className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
             </div>
             <div>
-              <label htmlFor="phone_number" className="block mb-2 text-sm font-medium text-gray-600">Phone Number</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="text" id="phone_number" name="phone_number" value={formData.phone_number} onChange={handleChange} required />
+              <label htmlFor="phone_number" className="block mb-2 text-sm font-medium text-purple-600">Phone Number</label>
+              <input className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="text" id="phone_number" name="phone_number" value={formData.phone_number} onChange={handleChange} required />
             </div>
             <div>
-              <label htmlFor="address" className="block mb-2 text-sm font-medium text-gray-600">Address</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="text" id="address" name="address" value={formData.address} onChange={handleChange} required />
+              <label htmlFor="address" className="block mb-2 text-sm font-medium text-purple-600">Address</label>
+              <input className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" type="text" id="address" name="address" value={formData.address} onChange={handleChange} required />
             </div>
           </div>
           <div className="flex gap-4 mt-6">
             <button className="w-full py-2 text-white bg-yellow-500 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" type="submit">Update</button>
-            <button type="button" onClick={onUpdateComplete} className="w-full py-2 text-gray-800 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">Cancel</button>
+            <button type="button" onClick={onUpdateComplete} className="w-full py-2 text-purple-800 bg-purple-200 rounded-md hover:bg-purple-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-400">Cancel</button>
           </div>
         </form>
       </div>
