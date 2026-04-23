@@ -6,7 +6,6 @@ import OpenAccount from "../../components/OpenAccount";
 import TransferMoney from "../../components/TransferMoney";
 import VerifyDocuments from "../../components/VerifyDocuments";
 import WithdwawMoney from "../../components/WithdrawMoney";
-import Dashboard from "../../pages/Dashboard";
 import Home from "../../pages/Home";
 import Loan from "../../pages/Loan";
 import LoginPage from "../../pages/LoginPage";
@@ -14,6 +13,7 @@ import RegistrationPage from "../../pages/RegistrationPage";
 import Services from "../../pages/Services";
 import TermsOfService from "../../pages/TermsOfService";
 import NotFound from "./NotFound";
+import DashboardWrapper from "./DashboardWrapper";
 
 export const ROUTES = [
   {
@@ -30,7 +30,7 @@ export const ROUTES = [
   },
   {
     path: "/dashboard/*",
-    element: <Dashboard />,
+    element: <DashboardWrapper />,
   },
   {
     path: "/loan",
