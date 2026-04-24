@@ -3,9 +3,10 @@ import { useState } from "react";
 const OpenAccount = () => {
 
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     dateOfBirth: '',
-    phone_number: '',
+    phone: '',
     address: '',
     citizenshipId: '',
     accountType: '',
@@ -22,29 +23,32 @@ const OpenAccount = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const nameParts = formData.fullName.split(' ');
-    const firstName = nameParts[0];
-    const lastName = nameParts.slice(1).join(' ');
+    // const nameParts = formData.fullName.split(' ');
+    // const firstName = nameParts[0];
+    // const lastName = nameParts.slice(1).join(' ');
 
     const postData = {
-      first_name: firstName,
-      last_name: lastName,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
       dateOfBirth: formData.dateOfBirth,
-      role: 'user',
-      phone_number: formData.phone_number,
+      // phone: formData.phone,
+      phone: formData.phone.startsWith('+') ? formData.phone : '+' + formData.phone,
       address: formData.address,
       citizenshipId: formData.citizenshipId,
       accountType: formData.accountType,
     };
 
     try {
-      const response = await fetch('http://localhost:8080/api/users', {
+      const response = await fetch('http://localhost:8080/api/user/openaccount', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
         body: JSON.stringify(postData),
       });
+      console.log('Token:', `${localStorage.getItem('authToken')}`);
+      console.log('postData:', postData);
 
       if (response.ok) {
         const result = await response.json();
@@ -71,16 +75,30 @@ const OpenAccount = () => {
 
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="fullName">
-                Full name
+                First name
               </label>
               <input
                 className="shadow appearance-none border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 w-full px-3 py-2"
-                id="fullName"
-                name="fullName"
+                id="firstName"
+                name="firstName"
                 type="text"
                 onChange={handleChange}
-                value={formData.fullName}
-                placeholder="Enter your full name"
+                value={formData.firstName}
+                placeholder="Enter your first name"
+              />
+            </div>
+            <div className="mb-6">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="fullName">
+                Last name
+              </label>
+              <input
+                className="shadow appearance-none border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 w-full px-3 py-2"
+                id="lastName"
+                name="lastName"
+                type="text"
+                onChange={handleChange}
+                value={formData.lastName}
+                placeholder="Enter your last name"
               />
             </div>
             <div className="mb-6">
@@ -101,11 +119,11 @@ const OpenAccount = () => {
                 Phone Number            </label>
               <input
                 className="shadow appearance-none border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 w-full px-3 py-2"
-                id="phone_number"
-                name="phone_number"
+                id="phone"
+                name="phone"
                 type="tel"
                 onChange={handleChange}
-                value={formData.phone_number}
+                value={formData.phone}
                 placeholder="Enter your phone number"
               />
             </div>
@@ -119,9 +137,9 @@ const OpenAccount = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="">Select Account type</option>
-                <option value="current">Current</option>
-                <option value="savings">Savings</option>
-                <option value="business">Business</option>
+                <option value="CURRENT">Current</option>
+                <option value="CHECKING">Checking</option>
+                <option value="FIXED_DEPOSIT">Fixed Deposit</option>
               </select>
             </div>
             <div className="mb-6">
@@ -138,6 +156,19 @@ const OpenAccount = () => {
               />
             </div>
             <div className="mb-6">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="fullName">
+                Citizenship ID            </label>
+              <input
+                className="shadow appearance-none border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 w-full px-3 py-2"
+                id="citizenshipId"
+                name="citizenshipId"
+                type="text"
+                onChange={handleChange}
+                value={formData.citizenshipId}
+                placeholder="Enter your citizenship ID"
+              />
+            </div>
+            {/* <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="initialDeposit">
                 Initial Deposit
               </label>
@@ -147,7 +178,7 @@ const OpenAccount = () => {
                 type="number"
                 placeholder="minimum $500"
               />
-            </div>
+            </div> */}
             {/* <div className="flex items-center justify-between"> */}
           </div>
           <div className="w-full py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50">

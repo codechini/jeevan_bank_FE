@@ -21,10 +21,21 @@ export const register = async (userData) => {
   return response.data;
 };
 
+// export const login = async (credentials) => {
+//   const response = await api.post('/login', credentials);
+//   if (response.data.token) {
+//     localStorage.setItem('authToken', response.data.token);
+//     localStorage.setItem('user', JSON.stringify(response.data.user));
+//   }
+//   return response.data;
+// };
+
 export const login = async (credentials) => {
   const response = await api.post('/login', credentials);
-  if (response.data.token) {
-    localStorage.setItem('authToken', response.data.token);
+  if (response.data.success && response.data.data?.token) {
+    const { token, username, role } = response.data.data;
+    localStorage.setItem('authToken', token);
+    localStorage.setItem('user', JSON.stringify({ username, role }));
   }
   return response.data;
 };
