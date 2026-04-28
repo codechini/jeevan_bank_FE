@@ -1,130 +1,224 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const TransferMoney = () => {
+  const [accounts, setAccounts] = useState([]);
+  const [selectedAccount, setSelectedAccount] = useState("");
+  const [toAccountNumber, setToAccountNumber] = useState("");
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [fetchingAccounts, setFetchingAccounts] = useState(true);
+  const [accountError, setAccountError] = useState("");
+  const [formError, setFormError] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone_number: '',
-    address: '',
-    account_number: '',
-    balance: '',
-    loan_type: '', // added loan_type field
-  });
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/user/accounts", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+        const data = await response.json();
+        console.log("Accounts API Response:", data);
+
+        if (response.ok && data.success) {
+          setAccounts(data.data || []);
+          console.log("Accounts loaded:", data.data);
+        } else {
+          setAccountError(data.message || "Failed to fetch accounts");
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setAccountError("Error fetching accounts");
+      } finally {
+        setFetchingAccounts(false);
+      }
+    };
+
+    fetchAccounts();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match.");
+    setFormError("");
+    setShowSuccess(false);
+
+    if (!selectedAccount) {
+      setFormError("Please select an account");
       return;
     }
 
-    const nameParts = formData.fullName.split(' ');
-    const firstName = nameParts[0];
-    const lastName = nameParts.slice(1).join(' ');
+    if (!toAccountNumber) {
+      setFormError("Please enter recipient account number");
+      return;
+    }
 
-    const postData = {
-      first_name: firstName,
-      last_name: lastName,
-      email: formData.email,
-      password: formData.password,
-      role: 'user',
-      phone_number: formData.phone_number,
-      account_number: Number(formData.account_number),
-      address: formData.address,
-      balance: parseFloat(formData.balance),
-      loan_type: formData.loan_type, // include loan type in payload
-    };
+    if (!amount || parseFloat(amount) <= 0) {
+      setFormError("Please enter a valid amount");
+      return;
+    }
+
+    setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(postData),
-      });
+      const response = await fetch(
+        `http://localhost:8080/api/user/accounts/${selectedAccount}/transfer`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+          body: JSON.stringify({
+            toAccountNumber: toAccountNumber,
+            amount: parseFloat(amount),
+            description: description,
+          }),
+        }
+      );
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log('User registered successfully:', result);
-        alert('Registration successful!');
-        // Optionally redirect or clear form
+      const result = await response.json();
+      console.log("Transfer API Response:", result);
+
+      if (response.ok && result.success) {
+        console.log("Transfer successful:", result);
+        setShowSuccess(true);
+        alert("Transfer successful!");
+        setSelectedAccount("");
+        setToAccountNumber("");
+        setAmount("");
+        setDescription("");
       } else {
-        const error = await response.json();
-        console.error('Registration failed:', error);
-        alert(`Registration failed: ${error.message || 'Unknown error'}`);
+        setFormError(result.message || "Transfer failed");
+        alert(`Transfer failed: ${result.message || "Unknown error"}`);
       }
-    } catch (error) {
-      console.error('Error during registration:', error);
-      alert('An error occurred during registration.');
+    } catch (err) {
+      console.error("Transfer error:", err);
+      setFormError("Error during transfer");
+      alert("An error occurred during transfer.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
+  const displayError = accountError || formError;
 
+  return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
       <h1 className="text-4xl font-bold mb-8 text-gray-800">Transfer Money</h1>
-      <form className="bg-white p-6 rounded-lg shadow-md w-full max-w-md" onSubmit={handleSubmit}>
+      <form
+        className="bg-white p-6 rounded-lg shadow-md w-full max-w-md"
+        onSubmit={handleSubmit}
+      >
         <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="recipient">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="account"
+          >
+            Select Account
+          </label>
+          <select
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            id="account"
+            value={selectedAccount}
+            onChange={(e) => setSelectedAccount(e.target.value)}
+            disabled={fetchingAccounts}
+          >
+            <option value="">
+              {fetchingAccounts
+                ? "Loading accounts..."
+                : accounts.length === 0
+                ? "No accounts available"
+                : "Select an account"}
+            </option>
+            {accounts.map((account) => (
+              <option key={account.accountId} value={account.accountId}>
+                {account.accountNumber} - {account.accountType}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mb-6">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="toAccountNumber"
+          >
             Recipient Account Number
           </label>
           <input
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-            type="numeric"
-            id="recipient"
-            name="recipient"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            id="toAccountNumber"
+            type="text"
             placeholder="Enter recipient account number"
+            value={toAccountNumber}
+            onChange={(e) => setToAccountNumber(e.target.value)}
+            disabled={loading}
           />
         </div>
+
         <div className="mb-6">
-          <label htmlFor="fullName" className="block mb-2 text-sm font-medium text-gray-600">Full Name</label>
-          <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" type="text" id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} />
-        </div>
-        <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="amount">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="amount"
+          >
             Amount
           </label>
           <input
-            className="shadow appearance-none border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 w-full px-3 py-2"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="amount"
             type="number"
+            step="0.01"
+            min="0"
             placeholder="Enter amount to transfer"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            disabled={loading}
           />
         </div>
+
         <div className="mb-6">
-          <label htmlFor="loan_type" className="block mb-2 text-sm font-medium text-gray-600">Payment method</label>
-          <select
-            id="loan_type"
-            name="loan_type"
-            value={formData.loan_type}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="description"
           >
-            <option value="">Select payment method</option>
-            <option value="imps">IMPS</option>
-            <option value="neft">NEFT</option>
-            <option value="netbanking">Net banking</option>
-            <option value="quick">Quick</option>
-          </select>
+            Description
+          </label>
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            id="description"
+            type="text"
+            placeholder="Enter description (e.g., Transfer to friend)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            disabled={loading}
+          />
         </div>
+
+        {displayError && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {displayError}
+          </div>
+        )}
+
+        {showSuccess && (
+          <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+            Transfer completed successfully!
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
           <button
-            className="w-full py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            className="w-full py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
             type="submit"
+            disabled={loading || fetchingAccounts}
           >
-            Transfer
+            {loading ? "Transferring..." : "Transfer"}
           </button>
         </div>
       </form>
