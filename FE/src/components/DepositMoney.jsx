@@ -122,8 +122,8 @@ const DepositMoney = () => {
               {fetchingAccounts
                 ? "Loading accounts..."
                 : accounts.length === 0
-                ? "No accounts available"
-                : "Select an account"}
+                  ? "No accounts available"
+                  : "Select an account"}
             </option>
             {accounts.map((account) => (
               <option key={account.accountId} value={account.accountId}>
