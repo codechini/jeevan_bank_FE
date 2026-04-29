@@ -1,117 +1,192 @@
 import { useState } from "react";
-import Button from "./Button";
 
 const ApplyForLoan = ({ title = 'Apply For Loan' }) => {
 
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone_number: '',
-    address: '',
-    account_number: '',
-    balance: '',
-    loan_type: '', // added loan_type field
+    loanType: '',
+    principalAmount: '',
+    termMonths: '',
+    reason: '',
   });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
+    setSuccess(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match.");
+    setError('');
+    setSuccess(false);
+
+    if (!formData.loanType) {
+      setError('Please select a loan type.');
       return;
     }
 
-    const nameParts = formData.fullName.split(' ');
-    const firstName = nameParts[0];
-    const lastName = nameParts.slice(1).join(' ');
+    if (!formData.principalAmount || parseFloat(formData.principalAmount) <= 0) {
+      setError('Please enter a valid loan amount.');
+      return;
+    }
 
-    const postData = {
-      first_name: firstName,
-      last_name: lastName,
-      email: formData.email,
-      password: formData.password,
-      role: 'user',
-      phone_number: formData.phone_number,
-      account_number: Number(formData.account_number),
-      address: formData.address,
-      balance: parseFloat(formData.balance),
-      loan_type: formData.loan_type, // include loan type in payload
-    };
+    if (!formData.termMonths || parseInt(formData.termMonths) <= 0) {
+      setError('Please enter a valid loan term.');
+      return;
+    }
+
+    if (!formData.reason.trim()) {
+      setError('Please provide a reason for the loan.');
+      return;
+    }
+
+    setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/users', {
+      const response = await fetch('http://localhost:8080/api/user/applyloan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
-        body: JSON.stringify(postData),
+        body: JSON.stringify({
+          loanType: formData.loanType,
+          principalAmount: parseFloat(formData.principalAmount),
+          termMonths: parseInt(formData.termMonths),
+          reason: formData.reason.trim(),
+        }),
       });
 
+      const result = await response.json();
+
       if (response.ok) {
-        const result = await response.json();
-        console.log('User registered successfully:', result);
-        alert('Registration successful!');
-        // Optionally redirect or clear form
+        console.log('Loan application submitted successfully:', result);
+        setSuccess(true);
+        setFormData({ loanType: '', principalAmount: '', termMonths: '', reason: '' });
       } else {
-        const error = await response.json();
-        console.error('Registration failed:', error);
-        alert(`Registration failed: ${error.message || 'Unknown error'}`);
+        setError(result.message || 'Loan application failed.');
       }
-    } catch (error) {
-      console.error('Error during registration:', error);
-      alert('An error occurred during registration.');
+    } catch (err) {
+      console.error('Error submitting loan application:', err);
+      setError('An error occurred while submitting the application.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="w-full max-w-4xl p-8 bg-white rounded-lg shadow-md">
-        <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">{title}</h2>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
+      <h1 className="text-4xl font-bold mb-8 text-gray-800">{title}</h1>
+      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-              <label htmlFor="Loan reason" className="block mb-2 text-sm font-medium text-gray-600">Loan reason</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" type="text" id="address" name="address" value={formData.address} onChange={handleChange} />
-            </div>
-            <div>
-              <label htmlFor="Loan Ammount" className="block mb-2 text-sm font-medium text-gray-600">Loan Amount</label>
-              <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" type="number" id="account_number" name="account_number" value={formData.account_number} onChange={handleChange} />
-            </div>
-            <div>
-              <label htmlFor="loan_type" className="block mb-2 text-sm font-medium text-gray-600">Loan Type</label>
+
+            <div className="mb-6">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="loanType">
+                Loan Type
+              </label>
               <select
-                id="loan_type"
-                name="loan_type"
-                value={formData.loan_type}
+                className="shadow appearance-none border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 w-full px-3 py-2 bg-white"
+                id="loanType"
+                name="loanType"
+                value={formData.loanType}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                disabled={loading}
               >
                 <option value="">Select a loan type</option>
-                <option value="personal">Personal</option>
-                <option value="home">Home</option>
-                <option value="auto">Auto</option>
-                <option value="education">Education</option>
+                <option value="PERSONAL">Personal</option>
+                <option value="HOME">Home</option>
+                <option value="AUTO">Auto</option>
+                <option value="EDUCATION">Education</option>
               </select>
             </div>
 
+            <div className="mb-6">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="principalAmount">
+                Principal Amount
+              </label>
+              <input
+                className="shadow appearance-none border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 w-full px-3 py-2"
+                id="principalAmount"
+                name="principalAmount"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="Enter loan amount"
+                value={formData.principalAmount}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="termMonths">
+                Term (Months)
+              </label>
+              <input
+                className="shadow appearance-none border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 w-full px-3 py-2"
+                id="termMonths"
+                name="termMonths"
+                type="number"
+                step="1"
+                min="1"
+                placeholder="Enter loan term in months"
+                value={formData.termMonths}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="reason">
+                Reason
+              </label>
+              <textarea
+                className="shadow appearance-none border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 w-full px-3 py-2"
+                id="reason"
+                name="reason"
+                rows="4"
+                placeholder="Describe the reason for the loan"
+                value={formData.reason}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
+
           </div>
-          <div className="mt-6">
-            <button className="w-full py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" type="submit">
-              Apply
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+              Loan application submitted successfully!
+            </div>
+          )}
+
+          <div className="w-full py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50">
+            <button
+              className="w-full py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? 'Submitting...' : 'Apply'}
             </button>
           </div>
         </form>
       </div>
     </div>
   );
-}
+};
+
 export default ApplyForLoan;
