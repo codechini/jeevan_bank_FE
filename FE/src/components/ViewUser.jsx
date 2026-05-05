@@ -74,6 +74,39 @@ const ViewUser = () => {
     }
   };
 
+  const handleChangeRole = async (userId, currentRole) => {
+    const newRole = currentRole === 'USER' ? 'ADMIN' : 'USER';
+    const confirmChange = window.confirm(`Change ${currentRole === 'USER' ? 'this user to' : 'this admin to'} ${newRole}?`);
+
+    if (!confirmChange) return;
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/admin/users/${userId}/role`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: JSON.stringify({ role: newRole }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setUsers(prevUsers =>
+          prevUsers.map(user =>
+            user.userId === userId ? { ...user, role: newRole } : user
+          )
+        );
+      } else {
+        setError(data.message || 'Failed to change role');
+      }
+    } catch (err) {
+      console.error('Error changing role:', err);
+      setError('Error changing role');
+    }
+  };
+
   const totalUsers = users.length;
   const totalPages = Math.ceil(totalUsers / USERS_PER_PAGE);
   const startIndex = (currentPage - 1) * USERS_PER_PAGE;
@@ -125,10 +158,14 @@ const ViewUser = () => {
                   <p><strong>Email:</strong> {user.email}</p>
                   <p><strong>Role:</strong> {user.role}</p>
                   <p><strong>Status:</strong> {user.isAccountHolderActive ? 'Active' : 'Inactive'}</p>
-                  <div className="mt-2">
+                  <div className="flex gap-2 mt-2 flex-wrap">
                     <Button
                       variant={user.isAccountHolderActive ? 'deactivate' : 'activate'}
                       onClick={() => handleToggleUserStatus(user.userId, user.isAccountHolderActive)}
+                    />
+                    <Button
+                      variant="changeRole"
+                      onClick={() => handleChangeRole(user.userId, user.role)}
                     />
                   </div>
                 </li>
