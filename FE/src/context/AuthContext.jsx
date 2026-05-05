@@ -7,7 +7,10 @@ export const AuthProvider = ({ children }) => {
   const [user, setUserState] = useState(null);
   const [token, setToken] = useState(getToken() || null);
   const [isAuthenticated, setIsAuthenticated] = useState(!!getToken());
-  const [role, setRole] = useState(null);
+  const [role, setRole] = useState(() => {
+    const storedUser = getUser();
+    return storedUser?.role || null;
+  });
 
   useEffect(() => {
     const storedUser = getUser();
@@ -19,11 +22,11 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     const response = await apiLogin(credentials);
-    if (response.token) {
-      setToken(response.token);
-      setUserState(response.user);
-      setRole(response.user?.role || null);
-      setUser(response.user);
+    if (response.data?.token) {
+      setToken(response.data.token);
+      setUserState(response.data);
+      setRole(response.data.role || null);
+      setUser({ username: response.data.username, role: response.data.role });
       setIsAuthenticated(true);
     }
     return response;

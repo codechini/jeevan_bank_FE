@@ -18,6 +18,10 @@ const Button = ({
         return "bg-red-500 hover:bg-red-700 text-white";
       case "read":
         return "bg-gray-500 hover:bg-gray-600 text-white";
+      case "activate":
+        return "bg-green-500 hover:bg-green-600 text-white";
+      case "deactivate":
+        return "bg-red-500 hover:bg-red-700 text-white";
       default:
         return "bg-yellow-500 hover:bg-yellow-600 text-white";
     }
@@ -27,6 +31,10 @@ const Button = ({
     children ||
     (variant === "default"
       ? "Submit"
+      : variant === "activate"
+      ? "Activate"
+      : variant === "deactivate"
+      ? "Deactivate"
       : variant.charAt(0).toUpperCase() + variant.slice(1));
 
   const handleClick = (e) => {

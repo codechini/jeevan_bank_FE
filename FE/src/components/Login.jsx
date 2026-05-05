@@ -37,7 +37,7 @@ const Login = () => {
         password: formData.password,
       });
 
-      if (response.user?.role === 'ADMIN') {
+      if (response.data?.role === 'ADMIN') {
         navigate('/dashboard');
       } else {
         navigate('/services');
