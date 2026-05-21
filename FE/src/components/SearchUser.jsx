@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import Button from './Button';
+import UpdateAccountHolder from './UpdateAccountHolder';
 
 const SearchUser = () => {
   const [userId, setUserId] = useState('');
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showAccountSelector, setShowAccountSelector] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editAccountId, setEditAccountId] = useState('');
+  const [editInitialData, setEditInitialData] = useState(null);
 
   const getAuthHeaders = () => ({
     'Content-Type': 'application/json',
@@ -27,7 +32,21 @@ const SearchUser = () => {
       });
       const result = await response.json();
       if (response.ok && result.success) {
-        setUserData(result.data);
+        const user = result.data;
+        if (user?.accounts?.length > 0) {
+          const enrichedAccounts = await Promise.all(
+            user.accounts.map(async (acc) => {
+              const res = await fetch(`http://localhost:8080/api/admin/accounts/${acc.accountId}`, {
+                headers: getAuthHeaders(),
+              });
+              const data = await res.json();
+              return { ...acc, balance: data?.data?.balance ?? null };
+            })
+          );
+          setUserData({ ...user, accounts: enrichedAccounts });
+        } else {
+          setUserData(user);
+        }
       } else {
         setError(result.message || 'User not found');
       }
@@ -218,6 +237,77 @@ const SearchUser = () => {
               onClick={() => handleChangeRole(userData.userId, userData.role)}
             />
             <Button variant="delete" onClick={() => handleDelete(userData.userId)} />
+            {userData.accounts && userData.accounts.length > 0 && (
+              <div className="relative">
+                <Button
+                  variant="update"
+                  onClick={() => setShowAccountSelector((prev) => !prev)}
+                >
+                  Edit Account
+                </Button>
+                {showAccountSelector && (
+                  <>
+                    <div className="absolute right-0 z-40 mt-1 w-72 bg-white border border-purple-200 rounded-md shadow-lg">
+                      {userData.accounts.map((acc) => (
+                        <button
+                          key={acc.accountId}
+                          onClick={() => {
+                            setEditAccountId(acc.accountId);
+                            setEditInitialData({
+                              firstName: userData.firstName,
+                              lastName: userData.lastName,
+                              dateOfBirth: userData.dateOfBirth,
+                              phone: userData.phone,
+                              address: userData.address,
+                              citizenshipId: userData.citizenshipId,
+                              accountType: acc.accountType,
+                            });
+                            setShowAccountSelector(false);
+                            setShowEditModal(true);
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm hover:bg-purple-50 border-b border-purple-100 last:border-b-0"
+                        >
+                          <span className="font-medium">{acc.accountNumber}</span>
+                          <span className="ml-2 text-xs text-purple-600">({acc.accountType})</span>
+                          {acc.balance != null && (
+                            <span className="ml-2 text-xs text-gray-500">— ${Number(acc.balance).toFixed(2)}</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                    <div
+                      className="fixed inset-0 z-30"
+                      onClick={() => setShowAccountSelector(false)}
+                    />
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Edit Account Holder Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="relative w-full max-w-lg mx-4 p-6 bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => { setShowEditModal(false); setShowAccountSelector(false); }}
+              className="absolute text-gray-500 top-3 right-3 hover:text-gray-700"
+            >
+              ✕
+            </button>
+            <UpdateAccountHolder
+              mode="modal"
+              accountId={editAccountId}
+              initialData={editInitialData}
+              onClose={() => { setShowEditModal(false); setShowAccountSelector(false); }}
+              onSuccess={() => {
+                setShowEditModal(false);
+                setShowAccountSelector(false);
+                handleSearch();
+              }}
+            />
           </div>
         </div>
       )}
