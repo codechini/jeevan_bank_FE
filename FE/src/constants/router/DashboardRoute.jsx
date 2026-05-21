@@ -4,6 +4,7 @@ import ViewUser from "../../components/ViewUser";
 import DashboardCreateUser from "../../pages/DashboardCreateUser";
 import DashboardHome from "../../pages/DashboardHome";
 import DashboardSearchUsers from "../../pages/DashboardSearchUsers";
+import DashboardUpdateAccount from "../../pages/DashboardUpdateAccount";
 
 export const DASHBOARD_ROUTES = [
   {
@@ -30,5 +31,10 @@ export const DASHBOARD_ROUTES = [
     path: "updateusers",
     name: "Update Users",
     element: <UpdateUser />,
-  }
+  },
+  {
+    path: "updateaccount",
+    name: "Update Account",
+    element: <DashboardUpdateAccount />,
+  },
 ];
