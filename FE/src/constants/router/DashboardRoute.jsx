@@ -1,4 +1,7 @@
-// import UserCount from "../../components/UserCount";
+import AllAccounts from "../../components/AllAccounts";
+import AllCards from "../../components/AllCards";
+import AllChequeBooks from "../../components/AllChequeBooks";
+import AllLoans from "../../components/AllLoans";
 import UpdateUser from "../../components/UpdateUser";
 import ViewUser from "../../components/ViewUser";
 import DashboardCreateUser from "../../pages/DashboardCreateUser";
@@ -33,8 +36,28 @@ export const DASHBOARD_ROUTES = [
     element: <UpdateUser />,
   },
   {
+    path: "viewaccounts",
+    name: "View Accounts",
+    element: <AllAccounts />,
+  },
+  {
+    path: "loans",
+    name: "View Loans",
+    element: <AllLoans />,
+  },
+  {
+    path: "chequebooks",
+    name: "View Cheque Books",
+    element: <AllChequeBooks />,
+  },
+  {
+    path: "cards",
+    name: "View Cards",
+    element: <AllCards />,
+  },
+  {
     path: "updateaccount",
-    name: "Update Account",
+    name: "SearchAccount",
     element: <DashboardUpdateAccount />,
   },
 ];
