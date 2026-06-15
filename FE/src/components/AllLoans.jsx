@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Button from './Button';
 
 const LOANS_PER_PAGE = 10;
 
@@ -6,6 +7,7 @@ const AllLoans = () => {
   const [loans, setLoans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [actionLoading, setActionLoading] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   const fetchLoans = async () => {
@@ -32,6 +34,66 @@ const AllLoans = () => {
       setError('Error fetching loans');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleApprove = async (loanId) => {
+    if (!window.confirm('Approve this loan application?')) return;
+    setActionLoading(loanId);
+    try {
+      const response = await fetch(`http://localhost:8080/api/admin/loans/${loanId}/approve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setLoans(prev =>
+          prev.map(loan =>
+            loan.loanId === loanId ? { ...loan, status: 'Approved' } : loan
+          )
+        );
+      } else {
+        setError(data.message || 'Failed to approve loan');
+      }
+    } catch (err) {
+      console.error('Error approving loan:', err);
+      setError('Error approving loan');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleReject = async (loanId) => {
+    const reason = window.prompt('Reason for rejection:');
+    if (!reason) return;
+    setActionLoading(loanId);
+    try {
+      const response = await fetch(`http://localhost:8080/api/admin/loans/${loanId}/reject`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: JSON.stringify({ reason }),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setLoans(prev =>
+          prev.map(loan =>
+            loan.loanId === loanId ? { ...loan, status: 'Rejected' } : loan
+          )
+        );
+      } else {
+        setError(data.message || 'Failed to reject loan');
+      }
+    } catch (err) {
+      console.error('Error rejecting loan:', err);
+      setError('Error rejecting loan');
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -117,6 +179,7 @@ const AllLoans = () => {
                   <th className="px-4 py-3 font-semibold text-purple-800">Term</th>
                   <th className="px-4 py-3 font-semibold text-purple-800">Start Date</th>
                   <th className="px-4 py-3 font-semibold text-purple-800">Status</th>
+                  <th className="px-4 py-3 font-semibold text-purple-800">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -133,6 +196,22 @@ const AllLoans = () => {
                       <span className={`px-2 py-0.5 rounded text-xs font-semibold ${statusBadge(loan.status)}`}>
                         {loan.status}
                       </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      {loan.status === 'Pending' && (
+                        <div className="flex gap-1">
+                          <Button
+                            variant="approve"
+                            onClick={() => handleApprove(loan.loanId)}
+                            disabled={actionLoading === loan.loanId}
+                          />
+                          <Button
+                            variant="reject"
+                            onClick={() => handleReject(loan.loanId)}
+                            disabled={actionLoading === loan.loanId}
+                          />
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
