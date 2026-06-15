@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Button from './Button';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -6,6 +7,7 @@ const AllCards = () => {
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [actionLoading, setActionLoading] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   const fetchCards = async () => {
@@ -32,6 +34,65 @@ const AllCards = () => {
       setError('Error fetching cards');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleApprove = async (cardId) => {
+    if (!window.confirm('Approve this card?')) return;
+    setActionLoading(cardId);
+    try {
+      const response = await fetch(`http://localhost:8080/api/admin/cards/${cardId}/approve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setCards(prev =>
+          prev.map(card =>
+            card.cardId === cardId ? { ...card, status: 'APPROVED' } : card
+          )
+        );
+      } else {
+        setError(data.message || 'Failed to approve card');
+      }
+    } catch (err) {
+      console.error('Error approving card:', err);
+      setError('Error approving card');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleReject = async (cardId) => {
+    const reason = window.prompt('Reason for rejection:');
+    if (!reason) return;
+    setActionLoading(cardId);
+    try {
+      const response = await fetch(`http://localhost:8080/api/admin/cards/${cardId}/reject?reason=${encodeURIComponent(reason)}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setCards(prev =>
+          prev.map(card =>
+            card.cardId === cardId ? { ...card, status: 'REJECTED' } : card
+          )
+        );
+      } else {
+        setError(data.message || 'Failed to reject card');
+      }
+    } catch (err) {
+      console.error('Error rejecting card:', err);
+      setError('Error rejecting card');
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -131,6 +192,7 @@ const AllCards = () => {
                   <th className="px-4 py-3 font-semibold text-purple-800">Expires</th>
                   <th className="px-4 py-3 font-semibold text-purple-800">Daily Limit</th>
                   <th className="px-4 py-3 font-semibold text-purple-800">Status</th>
+                  <th className="px-4 py-3 font-semibold text-purple-800">Actions</th>
                   <th className="px-4 py-3 font-semibold text-purple-800">Issue Date</th>
                 </tr>
               </thead>
@@ -151,6 +213,22 @@ const AllCards = () => {
                       <span className={`px-2 py-0.5 rounded text-xs font-semibold ${statusBadge(card.status)}`}>
                         {card.status}
                       </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      {(card.status === 'Pending' || card.status === 'PENDING') && (
+                        <div className="flex gap-1">
+                          <Button
+                            variant="approve"
+                            onClick={() => handleApprove(card.cardId)}
+                            disabled={actionLoading === card.cardId}
+                          />
+                          <Button
+                            variant="reject"
+                            onClick={() => handleReject(card.cardId)}
+                            disabled={actionLoading === card.cardId}
+                          />
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">{formatDateTime(card.issueDate)}</td>
                   </tr>

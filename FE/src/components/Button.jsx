@@ -24,6 +24,10 @@ const Button = ({
         return "bg-red-500 hover:bg-red-700 text-white";
       case "changeRole":
         return "bg-purple-700 hover:bg-purple-800 text-white";
+      case "approve":
+        return "bg-green-600 hover:bg-green-700 text-white";
+      case "reject":
+        return "bg-red-600 hover:bg-red-700 text-white";
       default:
         return "bg-yellow-500 hover:bg-yellow-600 text-white";
     }
@@ -39,7 +43,11 @@ const Button = ({
           ? "Deactivate"
           : variant === "changeRole"
             ? "Change Role"
-            : variant.charAt(0).toUpperCase() + variant.slice(1));
+            : variant === "approve"
+              ? "Approve"
+              : variant === "reject"
+                ? "Reject"
+                : variant.charAt(0).toUpperCase() + variant.slice(1));
 
   const handleClick = (e) => {
     if (variant === "delete") {
