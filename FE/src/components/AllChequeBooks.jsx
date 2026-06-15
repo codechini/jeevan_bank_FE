@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Button from './Button';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -6,6 +7,7 @@ const AllChequeBooks = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [actionLoading, setActionLoading] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   const fetchRequests = async () => {
@@ -32,6 +34,66 @@ const AllChequeBooks = () => {
       setError('Error fetching chequebook requests');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleApprove = async (requestId) => {
+    if (!window.confirm('Approve this chequebook request?')) return;
+    setActionLoading(requestId);
+    try {
+      const response = await fetch(`http://localhost:8080/api/admin/chequebooks/${requestId}/approve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setRequests(prev =>
+          prev.map(req =>
+            req.requestId === requestId ? { ...req, status: 'Approved' } : req
+          )
+        );
+      } else {
+        setError(data.message || 'Failed to approve chequebook request');
+      }
+    } catch (err) {
+      console.error('Error approving chequebook request:', err);
+      setError('Error approving chequebook request');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleReject = async (requestId) => {
+    const reason = window.prompt('Reason for rejection:');
+    if (!reason) return;
+    setActionLoading(requestId);
+    try {
+      const response = await fetch(`http://localhost:8080/api/admin/chequebooks/${requestId}/reject`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: JSON.stringify({ reason }),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setRequests(prev =>
+          prev.map(req =>
+            req.requestId === requestId ? { ...req, status: 'Rejected' } : req
+          )
+        );
+      } else {
+        setError(data.message || 'Failed to reject chequebook request');
+      }
+    } catch (err) {
+      console.error('Error rejecting chequebook request:', err);
+      setError('Error rejecting chequebook request');
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -106,6 +168,7 @@ const AllChequeBooks = () => {
                   <th className="px-4 py-3 font-semibold text-purple-800">Delivery Address</th>
                   <th className="px-4 py-3 font-semibold text-purple-800">Request Date</th>
                   <th className="px-4 py-3 font-semibold text-purple-800">Status</th>
+                  <th className="px-4 py-3 font-semibold text-purple-800">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -121,6 +184,22 @@ const AllChequeBooks = () => {
                       <span className={`px-2 py-0.5 rounded text-xs font-semibold ${statusBadge(req.status)}`}>
                         {req.status}
                       </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      {req.status === 'Pending' && (
+                        <div className="flex gap-1">
+                          <Button
+                            variant="approve"
+                            onClick={() => handleApprove(req.requestId)}
+                            disabled={actionLoading === req.requestId}
+                          />
+                          <Button
+                            variant="reject"
+                            onClick={() => handleReject(req.requestId)}
+                            disabled={actionLoading === req.requestId}
+                          />
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}

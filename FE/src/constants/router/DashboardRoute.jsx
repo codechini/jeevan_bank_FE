@@ -21,21 +21,6 @@ export const DASHBOARD_ROUTES = [
     element: <ViewUser />,
   },
   {
-    path: "createusers",
-    name: "Create Users",
-    element: <DashboardCreateUser />,
-  },
-  {
-    path: "searchusers",
-    name: "Search Users",
-    element: <DashboardSearchUsers />,
-  },
-  {
-    path: "updateusers",
-    name: "Update Users",
-    element: <UpdateUser />,
-  },
-  {
     path: "viewaccounts",
     name: "View Accounts",
     element: <AllAccounts />,
@@ -54,6 +39,21 @@ export const DASHBOARD_ROUTES = [
     path: "cards",
     name: "View Cards",
     element: <AllCards />,
+  },
+  {
+    path: "createusers",
+    name: "Create Users",
+    element: <DashboardCreateUser />,
+  },
+  {
+    path: "searchusers",
+    name: "Search Users",
+    element: <DashboardSearchUsers />,
+  },
+  {
+    path: "updateusers",
+    name: "Update Users",
+    element: <UpdateUser />,
   },
   {
     path: "updateaccount",
