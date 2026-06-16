@@ -1,9 +1,8 @@
-// import { useState } from "react";
-// import { href } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import Links from "./Links";
 
 const Navbar = () => {
-  // const [activeLink, setActiveLink] = useState("/");
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="flex justify-center bg-purple-200 p-4 gap-4">
@@ -19,6 +18,11 @@ const Navbar = () => {
       <Links href="/services" >
         Services
       </Links>
+      {isAuthenticated && (
+        <Links href="/profile" >
+          Profile
+        </Links>
+      )}
     </div>
   );
 }
