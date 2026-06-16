@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const UpdateAccountHolder = ({ mode, accountId, initialData, onClose, onSuccess }) => {
+const UpdateAccountHolder = ({ mode, accountId, initialData, onClose, onSuccess, apiEndpoint = '/api/admin/accounts/' }) => {
   const [formData, setFormData] = useState({
     firstName: initialData?.firstName || '',
     lastName: initialData?.lastName || '',
@@ -27,7 +27,7 @@ const UpdateAccountHolder = ({ mode, accountId, initialData, onClose, onSuccess 
     };
 
     try {
-      const response = await fetch(`http://localhost:8080/api/admin/accounts/${accountId}`, {
+      const response = await fetch(`http://localhost:8080${apiEndpoint}${accountId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

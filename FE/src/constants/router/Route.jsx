@@ -14,6 +14,7 @@ const ApplyForChequeBook = lazy(() => import("../../components/ApplyForChequeBoo
 const DepositMoney = lazy(() => import("../../components/DepositMoney"));
 const Navbar = lazy(() => import("../../components/Navbar"));
 const OpenAccount = lazy(() => import("../../components/OpenAccount"));
+const ProfilePage = lazy(() => import("../../pages/ProfilePage"));
 const TransferMoney = lazy(() => import("../../components/TransferMoney"));
 const VerifyDocuments = lazy(() => import("../../components/VerifyDocuments"));
 const WithdwawMoney = lazy(() => import("../../components/WithdrawMoney"));
@@ -86,6 +87,10 @@ export const ROUTES = [
   {
     path: "/verifydocuments",
     element: <Suspense fallback={<PageLoader />}><VerifyDocuments /></Suspense>,
+  },
+  {
+    path: "/profile",
+    element: <Suspense fallback={<PageLoader />}><ProfilePage /></Suspense>,
   },
   {
     path: "*",
