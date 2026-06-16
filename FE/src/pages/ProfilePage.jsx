@@ -24,6 +24,7 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [editingAccount, setEditingAccount] = useState(null);
+  const [closingAccountId, setClosingAccountId] = useState(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -80,6 +81,31 @@ const ProfilePage = () => {
       setLoading(false);
     }
   }, []);
+
+  const handleCloseAccount = async (accountId) => {
+    if (!window.confirm('Are you sure you want to close this account?')) return;
+    setClosingAccountId(accountId);
+    try {
+      const response = await fetch(`http://localhost:8080/api/user/accounts/${accountId}/close`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        alert('Account closed successfully');
+        fetchData();
+      } else {
+        alert(result.message || 'Failed to close account');
+      }
+    } catch (err) {
+      alert('Error closing account');
+    } finally {
+      setClosingAccountId(null);
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -223,12 +249,23 @@ const ProfilePage = () => {
                       </td>
                       <td className="px-3 py-2 text-xs">{formatDate(acc.createdAt)}</td>
                       <td className="px-3 py-2">
-                        <button
-                          onClick={() => setEditingAccount(acc)}
-                          className="px-3 py-1 text-xs font-semibold text-purple-800 bg-purple-200 rounded hover:bg-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                        >
-                          Edit
-                        </button>
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => setEditingAccount(acc)}
+                            className="px-3 py-1 text-xs font-semibold text-purple-800 bg-purple-200 rounded hover:bg-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                          >
+                            Edit
+                          </button>
+                          {acc.status !== 'Closed' && (
+                            <button
+                              onClick={() => handleCloseAccount(acc.accountId)}
+                              disabled={closingAccountId === acc.accountId}
+                              className="px-3 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-400 disabled:opacity-50"
+                            >
+                              {closingAccountId === acc.accountId ? 'Closing...' : 'Close'}
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
