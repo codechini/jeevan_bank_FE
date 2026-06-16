@@ -85,6 +85,17 @@ const Services = () => {
             <a href="/verifydocuments" target="" rel="noopener noreferrer">Verify Documents</a>
           </button>
         </div>
+        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-700">Profile</h2>
+          <p className="text-gray-600">
+            View and manage your personal profile and account information.
+          </p>
+          <a href="/profile">
+            <button className="w-full mt-4 py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" type="submit">
+              View Profile
+            </button>
+          </a>
+        </div>
       </div>
     </div>
   );
