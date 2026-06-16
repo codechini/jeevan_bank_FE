@@ -9,6 +9,7 @@ const DepositMoney = () => {
   const [fetchingAccounts, setFetchingAccounts] = useState(true);
   const [accountError, setAccountError] = useState("");
   const [formError, setFormError] = useState("");
+  const [result, setResult] = useState(null);
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -22,11 +23,9 @@ const DepositMoney = () => {
         });
 
         const data = await response.json();
-        console.log("Accounts API Response:", data);
 
         if (response.ok && data.success) {
           setAccounts(data.data || []);
-          console.log("Accounts loaded:", data.data);
         } else {
           setAccountError(data.message || "Failed to fetch accounts");
         }
@@ -41,9 +40,23 @@ const DepositMoney = () => {
     fetchAccounts();
   }, []);
 
+  const handleReset = () => {
+    setResult(null);
+    setSelectedAccount("");
+    setAmount("");
+    setDescription("");
+    setFormError("");
+  };
+
+  const getSelectedAccountLabel = () => {
+    const acc = accounts.find((a) => a.accountId === selectedAccount);
+    return acc ? `${acc.accountNumber} — ${acc.accountType}` : "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError("");
+    setResult(null);
 
     if (!selectedAccount) {
       setFormError("Please select an account");
@@ -73,29 +86,71 @@ const DepositMoney = () => {
         }
       );
 
-      const result = await response.json();
-      console.log("Deposit API Response:", result);
+      const data = await response.json();
 
-      if (response.ok && result.success) {
-        console.log("Deposit successful:", result);
-        alert("Deposit successful!");
-        setSelectedAccount("");
-        setAmount("");
-        setDescription("");
+      if (response.ok && data.success) {
+        setResult(data.data || { amount: parseFloat(amount), description });
       } else {
-        setFormError(result.message || "Deposit failed");
-        alert(`Deposit failed: ${result.message || "Unknown error"}`);
+        setFormError(data.message || "Deposit failed");
       }
     } catch (err) {
       console.error("Deposit error:", err);
       setFormError("Error during deposit");
-      alert("An error occurred during deposit.");
     } finally {
       setLoading(false);
     }
   };
 
   const displayError = accountError || formError;
+
+  if (result) {
+    const acc = accounts.find((a) => a.accountId === selectedAccount);
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
+        <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+          <div className="mb-6 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-green-100 rounded-full">
+              <span className="text-3xl text-green-600">✓</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800">Deposit Successful!</h2>
+            <p className="mt-1 text-sm text-gray-500">Money has been deposited to your account</p>
+          </div>
+
+          <div className="p-4 mb-4 border border-gray-200 rounded-lg">
+            {acc && (
+              <div className="mb-3">
+                <p className="text-xs text-gray-500">Account</p>
+                <p className="text-sm font-mono font-bold text-gray-800">{acc.accountNumber} — {acc.accountType}</p>
+              </div>
+            )}
+            <div className="mb-3">
+              <p className="text-xs text-gray-500">Amount Deposited</p>
+              <p className="text-xl font-bold text-green-600">${parseFloat(amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+            </div>
+            {description && (
+              <div className="mb-3">
+                <p className="text-xs text-gray-500">Description</p>
+                <p className="text-sm text-gray-800">{description}</p>
+              </div>
+            )}
+            {result.transactionId && (
+              <div>
+                <p className="text-xs text-gray-500">Transaction ID</p>
+                <p className="text-xs font-mono text-gray-600">{result.transactionId}</p>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={handleReset}
+            className="w-full py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+          >
+            Make Another Deposit
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">

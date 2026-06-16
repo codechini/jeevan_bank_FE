@@ -11,7 +11,7 @@ const ApplyForLoan = ({ title = 'Apply For Loan' }) => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [result, setResult] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,13 +19,19 @@ const ApplyForLoan = ({ title = 'Apply For Loan' }) => {
       ...prev,
       [name]: value,
     }));
-    setSuccess(false);
+    setResult(null);
+  };
+
+  const handleReset = () => {
+    setResult(null);
+    setFormData({ loanType: '', principalAmount: '', termMonths: '', reason: '' });
+    setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setSuccess(false);
+    setResult(null);
 
     if (!formData.loanType) {
       setError('Please select a loan type.');
@@ -64,14 +70,12 @@ const ApplyForLoan = ({ title = 'Apply For Loan' }) => {
         }),
       });
 
-      const result = await response.json();
+      const data = await response.json();
 
-      if (response.ok) {
-        console.log('Loan application submitted successfully:', result);
-        setSuccess(true);
-        setFormData({ loanType: '', principalAmount: '', termMonths: '', reason: '' });
+      if (response.ok && data.success) {
+        setResult(data.data || { ...formData });
       } else {
-        setError(result.message || 'Loan application failed.');
+        setError(data.message || 'Loan application failed.');
       }
     } catch (err) {
       console.error('Error submitting loan application:', err);
@@ -80,6 +84,56 @@ const ApplyForLoan = ({ title = 'Apply For Loan' }) => {
       setLoading(false);
     }
   };
+
+  const loanTypeLabels = { PERSONAL: 'Personal', HOME: 'Home', AUTO: 'Auto', EDUCATION: 'Education' };
+
+  if (result) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
+        <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+          <div className="mb-6 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-green-100 rounded-full">
+              <span className="text-3xl text-green-600">✓</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800">Application Submitted!</h2>
+            <p className="mt-1 text-sm text-gray-500">Your loan application has been submitted for review</p>
+          </div>
+
+          <div className="p-4 mb-4 border border-gray-200 rounded-lg">
+            <div className="mb-3">
+              <p className="text-xs text-gray-500">Loan Type</p>
+              <p className="text-sm font-bold text-gray-800">{loanTypeLabels[result.loanType] || result.loanType}</p>
+            </div>
+            <div className="mb-3">
+              <p className="text-xs text-gray-500">Principal Amount</p>
+              <p className="text-lg font-bold text-gray-800">${parseFloat(result.principalAmount || formData.principalAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+            </div>
+            <div className="mb-3">
+              <p className="text-xs text-gray-500">Term</p>
+              <p className="text-sm text-gray-800">{result.termMonths || formData.termMonths} months</p>
+            </div>
+            <div className="mb-3">
+              <p className="text-xs text-gray-500">Reason</p>
+              <p className="text-sm text-gray-800">{result.reason || formData.reason}</p>
+            </div>
+            {result.loanId && (
+              <div>
+                <p className="text-xs text-gray-500">Application ID</p>
+                <p className="text-xs font-mono text-gray-600">{result.loanId}</p>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={handleReset}
+            className="w-full py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+          >
+            Apply for Another Loan
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
@@ -165,12 +219,6 @@ const ApplyForLoan = ({ title = 'Apply For Loan' }) => {
           {error && (
             <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
               {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-              Loan application submitted successfully!
             </div>
           )}
 

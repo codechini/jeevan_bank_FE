@@ -9,7 +9,7 @@ const WithdwawMoney = () => {
   const [fetchingAccounts, setFetchingAccounts] = useState(true);
   const [accountError, setAccountError] = useState("");
   const [formError, setFormError] = useState("");
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [result, setResult] = useState(null);
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -23,11 +23,9 @@ const WithdwawMoney = () => {
         });
 
         const data = await response.json();
-        console.log("Accounts API Response:", data);
 
         if (response.ok && data.success) {
           setAccounts(data.data || []);
-          console.log("Accounts loaded:", data.data);
         } else {
           setAccountError(data.message || "Failed to fetch accounts");
         }
@@ -42,10 +40,18 @@ const WithdwawMoney = () => {
     fetchAccounts();
   }, []);
 
+  const handleReset = () => {
+    setResult(null);
+    setSelectedAccount("");
+    setAmount("");
+    setDescription("");
+    setFormError("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError("");
-    setShowSuccess(false);
+    setResult(null);
 
     if (!selectedAccount) {
       setFormError("Please select an account");
@@ -75,30 +81,71 @@ const WithdwawMoney = () => {
         }
       );
 
-      const result = await response.json();
-      console.log("Withdraw API Response:", result);
+      const data = await response.json();
 
-      if (response.ok && result.success) {
-        console.log("Withdrawal successful:", result);
-        setShowSuccess(true);
-        alert("Withdrawal successful!");
-        setSelectedAccount("");
-        setAmount("");
-        setDescription("");
+      if (response.ok && data.success) {
+        setResult(data.data || { amount: parseFloat(amount), description });
       } else {
-        setFormError(result.message || "Withdrawal failed");
-        alert(`Withdrawal failed: ${result.message || "Unknown error"}`);
+        setFormError(data.message || "Withdrawal failed");
       }
     } catch (err) {
       console.error("Withdrawal error:", err);
       setFormError("Error during withdrawal");
-      alert("An error occurred during withdrawal.");
     } finally {
       setLoading(false);
     }
   };
 
   const displayError = accountError || formError;
+
+  if (result) {
+    const acc = accounts.find((a) => a.accountId === selectedAccount);
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
+        <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+          <div className="mb-6 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-green-100 rounded-full">
+              <span className="text-3xl text-green-600">✓</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800">Withdrawal Successful!</h2>
+            <p className="mt-1 text-sm text-gray-500">Money has been withdrawn from your account</p>
+          </div>
+
+          <div className="p-4 mb-4 border border-gray-200 rounded-lg">
+            {acc && (
+              <div className="mb-3">
+                <p className="text-xs text-gray-500">Account</p>
+                <p className="text-sm font-mono font-bold text-gray-800">{acc.accountNumber} — {acc.accountType}</p>
+              </div>
+            )}
+            <div className="mb-3">
+              <p className="text-xs text-gray-500">Amount Withdrawn</p>
+              <p className="text-xl font-bold text-red-600">${parseFloat(amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+            </div>
+            {description && (
+              <div className="mb-3">
+                <p className="text-xs text-gray-500">Description</p>
+                <p className="text-sm text-gray-800">{description}</p>
+              </div>
+            )}
+            {result.transactionId && (
+              <div>
+                <p className="text-xs text-gray-500">Transaction ID</p>
+                <p className="text-xs font-mono text-gray-600">{result.transactionId}</p>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={handleReset}
+            className="w-full py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+          >
+            Make Another Withdrawal
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
@@ -177,12 +224,6 @@ const WithdwawMoney = () => {
         {displayError && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
             {displayError}
-          </div>
-        )}
-
-        {showSuccess && (
-          <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-            Withdrawal completed successfully!
           </div>
         )}
 
