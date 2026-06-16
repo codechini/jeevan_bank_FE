@@ -25,6 +25,7 @@ const ProfilePage = () => {
   const [error, setError] = useState('');
   const [editingAccount, setEditingAccount] = useState(null);
   const [closingAccountId, setClosingAccountId] = useState(null);
+  const [deletingAccountId, setDeletingAccountId] = useState(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -104,6 +105,30 @@ const ProfilePage = () => {
       alert('Error closing account');
     } finally {
       setClosingAccountId(null);
+    }
+  };
+
+  const handleDeleteAccount = async (accountId) => {
+    if (!window.confirm('Are you sure you want to permanently delete this closed account?')) return;
+    setDeletingAccountId(accountId);
+    try {
+      const response = await fetch(`http://localhost:8080/api/user/accounts/${accountId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        alert('Account deleted successfully');
+        fetchData();
+      } else {
+        alert(result.message || 'Failed to delete account');
+      }
+    } catch (err) {
+      alert('Error deleting account');
+    } finally {
+      setDeletingAccountId(null);
     }
   };
 
@@ -256,13 +281,21 @@ const ProfilePage = () => {
                           >
                             Edit
                           </button>
-                          {acc.status !== 'Closed' && (
+                          {acc.status !== 'Closed' ? (
                             <button
                               onClick={() => handleCloseAccount(acc.accountId)}
                               disabled={closingAccountId === acc.accountId}
                               className="px-3 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-400 disabled:opacity-50"
                             >
                               {closingAccountId === acc.accountId ? 'Closing...' : 'Close'}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleDeleteAccount(acc.accountId)}
+                              disabled={deletingAccountId === acc.accountId}
+                              className="px-3 py-1 text-xs font-semibold text-red-700 border border-red-400 rounded hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-400 disabled:opacity-50"
+                            >
+                              {deletingAccountId === acc.accountId ? 'Deleting...' : 'Delete'}
                             </button>
                           )}
                         </div>
