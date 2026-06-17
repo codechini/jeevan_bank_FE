@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import DashboardWrapper from "./DashboardWrapper";
+import UserPageWrapper from "./UserPageWrapper";
 import NotFound from "./NotFound";
 
 const Home = lazy(() => import("../../pages/Home"));
@@ -16,6 +17,7 @@ const Navbar = lazy(() => import("../../components/Navbar"));
 const OpenAccount = lazy(() => import("../../components/OpenAccount"));
 const ProfilePage = lazy(() => import("../../pages/ProfilePage"));
 const TransferMoney = lazy(() => import("../../components/TransferMoney"));
+const ViewTransactions = lazy(() => import("../../pages/ViewTransactions"));
 const VerifyDocuments = lazy(() => import("../../components/VerifyDocuments"));
 const WithdwawMoney = lazy(() => import("../../components/WithdrawMoney"));
 
@@ -46,11 +48,11 @@ export const ROUTES = [
   },
   {
     path: "/loan",
-    element: <Suspense fallback={<PageLoader />}><Loan /></Suspense>,
+    element: <Suspense fallback={<PageLoader />}><UserPageWrapper><Loan /></UserPageWrapper></Suspense>,
   },
   {
     path: "/services",
-    element: <Suspense fallback={<PageLoader />}><Services /></Suspense>
+    element: <Suspense fallback={<PageLoader />}><UserPageWrapper><Services /></UserPageWrapper></Suspense>
   },
   {
     path: "/termsofservice",
@@ -58,27 +60,27 @@ export const ROUTES = [
   },
   {
     path: "/depositmoney",
-    element: <Suspense fallback={<PageLoader />}><DepositMoney /></Suspense>
+    element: <Suspense fallback={<PageLoader />}><UserPageWrapper><DepositMoney /></UserPageWrapper></Suspense>
   },
   {
     path: "/withdrawmoney",
-    element: <Suspense fallback={<PageLoader />}><WithdwawMoney /></Suspense>
+    element: <Suspense fallback={<PageLoader />}><UserPageWrapper><WithdwawMoney /></UserPageWrapper></Suspense>
   },
   {
     path: "/transfer",
-    element: <Suspense fallback={<PageLoader />}><TransferMoney /></Suspense>
+    element: <Suspense fallback={<PageLoader />}><UserPageWrapper><TransferMoney /></UserPageWrapper></Suspense>
   },
   {
     path: "/card",
-    element: <Suspense fallback={<PageLoader />}><ApplyForCard /></Suspense>
+    element: <Suspense fallback={<PageLoader />}><UserPageWrapper><ApplyForCard /></UserPageWrapper></Suspense>
   },
   {
     path: "/openaccount",
-    element: <Suspense fallback={<PageLoader />}><OpenAccount /></Suspense>
+    element: <Suspense fallback={<PageLoader />}><UserPageWrapper><OpenAccount /></UserPageWrapper></Suspense>
   },
   {
     path: "/applychequebook",
-    element: <Suspense fallback={<PageLoader />}><ApplyForChequeBook /></Suspense>
+    element: <Suspense fallback={<PageLoader />}><UserPageWrapper><ApplyForChequeBook /></UserPageWrapper></Suspense>
   },
   {
     path: "/navbar",
@@ -86,11 +88,15 @@ export const ROUTES = [
   },
   {
     path: "/verifydocuments",
-    element: <Suspense fallback={<PageLoader />}><VerifyDocuments /></Suspense>,
+    element: <Suspense fallback={<PageLoader />}><UserPageWrapper><VerifyDocuments /></UserPageWrapper></Suspense>,
   },
   {
     path: "/profile",
-    element: <Suspense fallback={<PageLoader />}><ProfilePage /></Suspense>,
+    element: <Suspense fallback={<PageLoader />}><UserPageWrapper><ProfilePage /></UserPageWrapper></Suspense>,
+  },
+  {
+    path: "/transactions",
+    element: <Suspense fallback={<PageLoader />}><UserPageWrapper><ViewTransactions /></UserPageWrapper></Suspense>,
   },
   {
     path: "*",

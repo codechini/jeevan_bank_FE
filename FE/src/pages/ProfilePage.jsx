@@ -281,6 +281,11 @@ const ProfilePage = () => {
                           >
                             Edit
                           </button>
+                          <a href={`/transactions?accountId=${acc.accountId}`}>
+                            <button className="px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-100 rounded hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                              Transactions
+                            </button>
+                          </a>
                           {acc.status !== 'Closed' ? (
                             <button
                               onClick={() => handleCloseAccount(acc.accountId)}

@@ -98,7 +98,14 @@ const ApplyForCard = () => {
   if (cardResult) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
-        <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+      <div className="max-w-md mx-auto mb-4">
+        <a href="/services">
+          <button className="px-6 py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+            Back to Services
+          </button>
+        </a>
+      </div>
+      <div className="w-full max-w-md p-8 mx-auto bg-white rounded-lg shadow-md">
           <div className="mb-6 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-green-100 rounded-full">
               <span className="text-3xl text-green-600">✓</span>
@@ -157,8 +164,16 @@ const ApplyForCard = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
-      <h1 className="text-4xl font-bold mb-8 text-gray-800">Apply for a Card</h1>
-      <form className="w-full max-w-md p-8 bg-white rounded-lg shadow-md" onSubmit={handleSubmit}>
+      <div className="max-w-md mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-bold text-gray-800">Apply for a Card</h1>
+          <a href="/services">
+            <button className="px-6 py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+              Back to Services
+            </button>
+          </a>
+        </div>
+        <form className="w-full p-8 bg-white rounded-lg shadow-md" onSubmit={handleSubmit}>
         <div className="mb-6">
           <label htmlFor="account" className="block mb-2 text-sm font-medium text-gray-600">
             Select Account
@@ -227,6 +242,7 @@ const ApplyForCard = () => {
           {loading ? 'Applying...' : 'Apply Now'}
         </button>
       </form>
+      </div>
     </div>
   );
 };

@@ -110,7 +110,14 @@ const TransferMoney = () => {
     const acc = accounts.find((a) => a.accountId === selectedAccount);
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
-        <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+      <div className="max-w-md mx-auto mb-4">
+        <a href="/services">
+          <button className="px-6 py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+            Back to Services
+          </button>
+        </a>
+      </div>
+      <div className="w-full max-w-md p-8 mx-auto bg-white rounded-lg shadow-md">
           <div className="mb-6 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-green-100 rounded-full">
               <span className="text-3xl text-green-600">✓</span>
@@ -161,11 +168,19 @@ const TransferMoney = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
-      <h1 className="text-4xl font-bold mb-8 text-gray-800">Transfer Money</h1>
-      <form
-        className="bg-white p-6 rounded-lg shadow-md w-full max-w-md"
-        onSubmit={handleSubmit}
-      >
+      <div className="max-w-md mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-bold text-gray-800">Transfer Money</h1>
+          <a href="/services">
+            <button className="px-6 py-2 text-purple-800 bg-purple-300 rounded-md hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+              Back to Services
+            </button>
+          </a>
+        </div>
+        <form
+          className="bg-white p-6 rounded-lg shadow-md"
+          onSubmit={handleSubmit}
+        >
         <div className="mb-6">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
@@ -267,6 +282,7 @@ const TransferMoney = () => {
           </button>
         </div>
       </form>
+      </div>
     </div>
   );
 };
