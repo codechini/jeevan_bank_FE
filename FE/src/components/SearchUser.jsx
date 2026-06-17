@@ -13,6 +13,8 @@ const SearchUser = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editAccountId, setEditAccountId] = useState('');
   const [editInitialData, setEditInitialData] = useState(null);
+  const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [editUserForm, setEditUserForm] = useState({ username: '', email: '', firstName: '', lastName: '' });
 
   const getAuthHeaders = () => ({
     'Content-Type': 'application/json',
@@ -251,6 +253,20 @@ const SearchUser = () => {
               variant="changeRole"
               onClick={() => handleChangeRole(userData.userId, userData.role)}
             />
+            <button
+              onClick={() => {
+                setEditUserForm({
+                  username: userData.username || '',
+                  email: userData.email || '',
+                  firstName: userData.firstName || '',
+                  lastName: userData.lastName || '',
+                });
+                setShowEditUserModal(true);
+              }}
+              className="px-4 py-2 m-1 text-sm font-semibold text-purple-800 bg-purple-200 rounded-md hover:bg-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            >
+              Edit User
+            </button>
             <Button variant="delete" onClick={() => handleDelete(userData.userId)} />
             {userData.accounts && userData.accounts.length > 0 && (
               <div className="relative">
@@ -323,6 +339,105 @@ const SearchUser = () => {
                 handleSearch();
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Profile Modal */}
+      {showEditUserModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="relative w-full max-w-lg mx-4 p-6 bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setShowEditUserModal(false)}
+              className="absolute text-gray-500 top-3 right-3 hover:text-gray-700"
+            >
+              ✕
+            </button>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  const payload = {};
+                  if (editUserForm.username) payload.username = editUserForm.username;
+                  if (editUserForm.email) payload.email = editUserForm.email;
+                  if (editUserForm.firstName) payload.firstName = editUserForm.firstName;
+                  if (editUserForm.lastName) payload.lastName = editUserForm.lastName;
+                  const response = await fetch(`http://localhost:8080/api/admin/users/${userData.userId}`, {
+                    method: 'PUT',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+                    },
+                    body: JSON.stringify(payload),
+                  });
+                  const result = await response.json();
+                  if (response.ok && result.success) {
+                    alert('User updated successfully!');
+                    setShowEditUserModal(false);
+                    searchByUserId(userData.userId);
+                  } else {
+                    alert(result.message || 'Failed to update user');
+                  }
+                } catch (err) {
+                  alert('Error updating user');
+                }
+              }}
+            >
+              <h3 className="mb-4 text-lg font-bold text-purple-800">Edit User Profile</h3>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="eu-username" className="block mb-1 text-sm font-medium text-purple-600">Username</label>
+                  <input
+                    id="eu-username" name="username" type="text"
+                    value={editUserForm.username}
+                    onChange={(e) => setEditUserForm((prev) => ({ ...prev, username: e.target.value }))}
+                    className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="eu-email" className="block mb-1 text-sm font-medium text-purple-600">Email</label>
+                  <input
+                    id="eu-email" name="email" type="email"
+                    value={editUserForm.email}
+                    onChange={(e) => setEditUserForm((prev) => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="eu-firstName" className="block mb-1 text-sm font-medium text-purple-600">First Name</label>
+                  <input
+                    id="eu-firstName" name="firstName" type="text"
+                    value={editUserForm.firstName}
+                    onChange={(e) => setEditUserForm((prev) => ({ ...prev, firstName: e.target.value }))}
+                    className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="eu-lastName" className="block mb-1 text-sm font-medium text-purple-600">Last Name</label>
+                  <input
+                    id="eu-lastName" name="lastName" type="text"
+                    value={editUserForm.lastName}
+                    onChange={(e) => setEditUserForm((prev) => ({ ...prev, lastName: e.target.value }))}
+                    className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button
+                  type="submit"
+                  className="w-full py-2 text-white bg-yellow-500 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                >
+                  Update User
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowEditUserModal(false)}
+                  className="w-full py-2 text-purple-800 bg-purple-200 rounded-md hover:bg-purple-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
