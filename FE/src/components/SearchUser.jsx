@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Button from './Button';
 import UpdateAccountHolder from './UpdateAccountHolder';
 
 const SearchUser = () => {
+  const location = useLocation();
   const [userId, setUserId] = useState('');
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -17,17 +19,13 @@ const SearchUser = () => {
     'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
   });
 
-  const handleSearch = async () => {
-    if (!userId) {
-      setError('Please enter a user ID');
-      setUserData(null);
-      return;
-    }
+  const searchByUserId = async (id) => {
+    if (!id) return;
     setLoading(true);
     setError('');
     setUserData(null);
     try {
-      const response = await fetch(`http://localhost:8080/api/admin/users/${userId}`, {
+      const response = await fetch(`http://localhost:8080/api/admin/users/${id}`, {
         headers: getAuthHeaders(),
       });
       const result = await response.json();
@@ -56,6 +54,23 @@ const SearchUser = () => {
     }
     setLoading(false);
   };
+
+  const handleSearch = async () => {
+    if (!userId) {
+      setError('Please enter a user ID');
+      setUserData(null);
+      return;
+    }
+    await searchByUserId(userId);
+  };
+
+  useEffect(() => {
+    const id = location.state?.userId;
+    if (id) {
+      setUserId(id);
+      searchByUserId(id);
+    }
+  }, []);
 
   const handleDelete = async (id) => {
     try {

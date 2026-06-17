@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from './Button';
 
 const USERS_PER_PAGE = 10;
 
 const ViewUser = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -167,6 +169,12 @@ const ViewUser = () => {
                       variant="changeRole"
                       onClick={() => handleChangeRole(user.userId, user.role)}
                     />
+                    <button
+                      onClick={() => navigate('/dashboard/searchusers', { state: { userId: user.userId } })}
+                      className="px-4 py-2 m-1 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700"
+                    >
+                      Manage
+                    </button>
                   </div>
                 </li>
               ))
