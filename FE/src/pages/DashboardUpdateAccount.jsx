@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Button from '../components/Button';
 import UpdateAccountHolder from '../components/UpdateAccountHolder';
 
 const DashboardUpdateAccount = () => {
+  const location = useLocation();
   const [searchInput, setSearchInput] = useState('');
   const [fetchedData, setFetchedData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -35,18 +37,15 @@ const DashboardUpdateAccount = () => {
     return match.accountId;
   };
 
-  const handleSearch = async () => {
-    if (!searchInput) {
-      setError('Please enter an account ID or number');
-      return;
-    }
+  const searchByValue = async (value) => {
+    if (!value) return;
     setLoading(true);
     setError('');
     setFetchedData(null);
     try {
-      const resolvedId = uuidRegex.test(searchInput)
-        ? searchInput
-        : await lookupAccountId(searchInput);
+      const resolvedId = uuidRegex.test(value)
+        ? value
+        : await lookupAccountId(value);
 
       const response = await fetch(`http://localhost:8080/api/admin/accounts/${resolvedId}`, {
         headers: {
@@ -66,6 +65,22 @@ const DashboardUpdateAccount = () => {
     }
     setLoading(false);
   };
+
+  const handleSearch = async () => {
+    if (!searchInput) {
+      setError('Please enter an account ID or number');
+      return;
+    }
+    await searchByValue(searchInput);
+  };
+
+  useEffect(() => {
+    const accountId = location.state?.accountId;
+    if (accountId) {
+      setSearchInput(accountId);
+      searchByValue(accountId);
+    }
+  }, []);
 
   const handleClose = async () => {
     if (!window.confirm('Are you sure you want to close this account?')) return;

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const ACCOUNTS_PER_PAGE = 10;
 
 const AllAccounts = () => {
+  const navigate = useNavigate();
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -101,6 +103,7 @@ const AllAccounts = () => {
                   <th className="px-4 py-3 font-semibold text-purple-800">Balance</th>
                   <th className="px-4 py-3 font-semibold text-purple-800">Status</th>
                   <th className="px-4 py-3 font-semibold text-purple-800">Created At</th>
+                  <th className="px-4 py-3 font-semibold text-purple-800">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -120,6 +123,14 @@ const AllAccounts = () => {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">{formatDate(acc.createdAt)}</td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => navigate('/dashboard/updateaccount', { state: { accountId: acc.accountId } })}
+                        className="px-3 py-1 text-xs font-semibold text-white bg-purple-600 rounded hover:bg-purple-700"
+                      >
+                        Manage
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
