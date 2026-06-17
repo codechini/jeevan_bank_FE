@@ -14,7 +14,7 @@ const statusColor = (status) => {
 };
 
 const ProfilePage = () => {
-  const { user, role } = useAuth();
+  const { user, role, updateUser } = useAuth();
 
   const [accounts, setAccounts] = useState([]);
   const [accountDetail, setAccountDetail] = useState(null);
@@ -23,6 +23,10 @@ const ProfilePage = () => {
   const [chequeBooks, setChequeBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({ username: '', email: '', firstName: '', lastName: '' });
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [editingAccount, setEditingAccount] = useState(null);
   const [closingAccountId, setClosingAccountId] = useState(null);
   const [deletingAccountId, setDeletingAccountId] = useState(null);
@@ -193,7 +197,34 @@ const ProfilePage = () => {
         )}
 
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-lg font-bold text-purple-800 mb-4">User Info</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-purple-800">User Info</h2>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setProfileForm({
+                    username: user?.username || '',
+                    email: accountDetail?.holderEmail || user?.email || '',
+                    firstName: accountDetail?.holderFirstName || user?.firstName || '',
+                    lastName: accountDetail?.holderLastName || user?.lastName || '',
+                  });
+                  setEditingProfile(true);
+                }}
+                className="px-3 py-1 text-xs font-semibold text-purple-800 bg-purple-200 rounded hover:bg-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => {
+                  setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+                  setChangingPassword(true);
+                }}
+                className="px-3 py-1 text-xs font-semibold text-orange-700 bg-orange-100 rounded hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              >
+                Change Password
+              </button>
+            </div>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-gray-500">Username</p>
@@ -489,6 +520,196 @@ const ProfilePage = () => {
                 fetchData();
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {editingProfile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="relative w-full max-w-lg mx-4 p-6 bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setEditingProfile(false)}
+              className="absolute text-gray-500 top-3 right-3 hover:text-gray-700"
+            >
+              ✕
+            </button>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  const payload = {};
+                  if (profileForm.username) payload.username = profileForm.username;
+                  if (profileForm.email) payload.email = profileForm.email;
+                  if (profileForm.firstName) payload.firstName = profileForm.firstName;
+                  if (profileForm.lastName) payload.lastName = profileForm.lastName;
+                  const response = await fetch('http://localhost:8080/api/user/profile', {
+                    method: 'PUT',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+                    },
+                    body: JSON.stringify(payload),
+                  });
+                  const result = await response.json();
+                  if (response.ok && result.success) {
+                    updateUser(payload);
+                    alert('Profile updated successfully!');
+                    setEditingProfile(false);
+                    fetchData();
+                  } else {
+                    alert(result.message || 'Failed to update profile');
+                  }
+                } catch (err) {
+                  alert('Error updating profile');
+                }
+              }}
+            >
+              <h3 className="mb-4 text-lg font-bold text-purple-800">Edit Profile</h3>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="pf-username" className="block mb-1 text-sm font-medium text-purple-600">Username</label>
+                  <input
+                    id="pf-username" name="username" type="text"
+                    value={profileForm.username}
+                    onChange={(e) => setProfileForm((prev) => ({ ...prev, username: e.target.value }))}
+                    className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="pf-email" className="block mb-1 text-sm font-medium text-purple-600">Email</label>
+                  <input
+                    id="pf-email" name="email" type="email"
+                    value={profileForm.email}
+                    onChange={(e) => setProfileForm((prev) => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="pf-firstName" className="block mb-1 text-sm font-medium text-purple-600">First Name</label>
+                  <input
+                    id="pf-firstName" name="firstName" type="text"
+                    value={profileForm.firstName}
+                    onChange={(e) => setProfileForm((prev) => ({ ...prev, firstName: e.target.value }))}
+                    className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="pf-lastName" className="block mb-1 text-sm font-medium text-purple-600">Last Name</label>
+                  <input
+                    id="pf-lastName" name="lastName" type="text"
+                    value={profileForm.lastName}
+                    onChange={(e) => setProfileForm((prev) => ({ ...prev, lastName: e.target.value }))}
+                    className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button
+                  type="submit"
+                  className="w-full py-2 text-white bg-yellow-500 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                >
+                  Update Profile
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditingProfile(false)}
+                  className="w-full py-2 text-purple-800 bg-purple-200 rounded-md hover:bg-purple-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {changingPassword && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="relative w-full max-w-lg mx-4 p-6 bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setChangingPassword(false)}
+              className="absolute text-gray-500 top-3 right-3 hover:text-gray-700"
+            >
+              ✕
+            </button>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+                  alert('New password and confirm password do not match');
+                  return;
+                }
+                try {
+                  const response = await fetch('http://localhost:8080/api/auth/change-password', {
+                    method: 'PUT',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+                    },
+                    body: JSON.stringify({
+                      currentPassword: passwordForm.currentPassword,
+                      newPassword: passwordForm.newPassword,
+                    }),
+                  });
+                  const result = await response.json();
+                  if (response.ok && result.success) {
+                    alert('Password changed successfully!');
+                    setChangingPassword(false);
+                    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+                  } else {
+                    alert(result.message || 'Failed to change password');
+                  }
+                } catch (err) {
+                  alert('Error changing password');
+                }
+              }}
+            >
+              <h3 className="mb-4 text-lg font-bold text-purple-800">Change Password</h3>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label htmlFor="cp-current" className="block mb-1 text-sm font-medium text-purple-600">Current Password</label>
+                  <input
+                    id="cp-current" name="currentPassword" type="password" required
+                    value={passwordForm.currentPassword}
+                    onChange={(e) => setPasswordForm((prev) => ({ ...prev, currentPassword: e.target.value }))}
+                    className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="cp-new" className="block mb-1 text-sm font-medium text-purple-600">New Password</label>
+                  <input
+                    id="cp-new" name="newPassword" type="password" required
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))}
+                    className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="cp-confirm" className="block mb-1 text-sm font-medium text-purple-600">Confirm New Password</label>
+                  <input
+                    id="cp-confirm" name="confirmPassword" type="password" required
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+                    className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button
+                  type="submit"
+                  className="w-full py-2 text-white bg-yellow-500 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                >
+                  Update Password
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChangingPassword(false)}
+                  className="w-full py-2 text-purple-800 bg-purple-200 rounded-md hover:bg-purple-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

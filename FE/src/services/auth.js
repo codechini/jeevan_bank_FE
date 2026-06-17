@@ -33,9 +33,9 @@ export const register = async (userData) => {
 export const login = async (credentials) => {
   const response = await api.post('/login', credentials);
   if (response.data.success && response.data.data?.token) {
-    const { token, username, role } = response.data.data;
+    const { token, username, role, email, firstName, lastName } = response.data.data;
     localStorage.setItem('authToken', token);
-    localStorage.setItem('user', JSON.stringify({ username, role }));
+    localStorage.setItem('user', JSON.stringify({ username, role, email, firstName, lastName }));
   }
   return response.data;
 };

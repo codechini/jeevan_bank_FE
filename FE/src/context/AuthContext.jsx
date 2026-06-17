@@ -26,10 +26,22 @@ export const AuthProvider = ({ children }) => {
       setToken(response.data.token);
       setUserState(response.data);
       setRole(response.data.role || null);
-      setUser({ username: response.data.username, role: response.data.role });
+      setUser({
+        username: response.data.username,
+        role: response.data.role,
+        email: response.data.email,
+        firstName: response.data.firstName,
+        lastName: response.data.lastName,
+      });
       setIsAuthenticated(true);
     }
     return response;
+  };
+
+  const updateUser = (data) => {
+    setUserState((prev) => ({ ...prev, ...data }));
+    const stored = getUser();
+    setUser({ ...stored, ...data });
   };
 
   const logout = () => {
@@ -49,6 +61,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         login,
         logout,
+        updateUser,
       }}
     >
       {children}
